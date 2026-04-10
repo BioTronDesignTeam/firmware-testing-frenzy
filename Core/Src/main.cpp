@@ -95,32 +95,6 @@ int main(void)
   MX_GPIO_Init();
   MX_FDCAN1_Init();
   /* USER CODE BEGIN 2 */
-  if(HAL_FDCAN_Start(&hfdcan1)!= HAL_OK)
-  {
-   Error_Handler();
-  }
-
-  // Activate the notification for new data in FIFO0 for FDCAN1
-  if (HAL_FDCAN_ActivateNotification(&hfdcan1, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  odriveCanFilter.IdType = FDCAN_STANDARD_ID;
-  odriveCanFilter.FilterIndex = 0;
-  // Set our filter to mask so it uses ID1 as a value and ID2 as mask
-  odriveCanFilter.FilterType = FDCAN_FILTER_MASK;
-  odriveCanFilter.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
-  // Assume node_id of Odrive is 0
-  odriveCanFilter.FilterID1 = 0x000;
-  // Mask first five bits (16 bit mask, 11 bit CAN address)
-  odriveCanFilter.FilterID2 = 0b11111 << 10;
-  odriveCanFilter.RxBufferIndex = 0;
-
-  if (HAL_FDCAN_ConfigFilter(&hfdcan1, &odriveCanFilter) != HAL_OK) {
-	  Error_Handler();
-  }
-
   initDrivers();
   /* USER CODE END 2 */
 
@@ -145,9 +119,14 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  odriveS1Handle->setAxisState(0x8);
   while (1)
   {
+	  if (odriveS1Handle->odriveRxBuffer[4] == 0x8) {
+		  BSP_LED_Toggle(LED_RED);
+	  }
 	  BSP_LED_Toggle(LED_GREEN);
+	  odriveS1Handle->setInputTorque(1);
 	  HAL_Delay(1000);
     /* USER CODE END WHILE */
 
@@ -295,11 +274,12 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
   if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET)
   {
     /* Retreive Rx messages from RX FIFO0 */
-    if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &odriveCanRxHeader, rxData) != HAL_OK)
+    if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &odriveCanRxHeader, odriveS1Handle->odriveRxBuffer) != HAL_OK)
     {
     	Error_Handler();
     }
     else {
+
     	BSP_LED_Toggle(LED_YELLOW);
     }
 

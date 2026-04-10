@@ -21,9 +21,9 @@ private:
 
 	// TODO: Replace test bytes
 	uint8_t odriveTxBuffer[FDCAN_DLC_BYTES_8] =  {0};
-	uint8_t odriveRxBuffer[FDCAN_DLC_BYTES_8] = {0};
 
 public:
+	uint8_t odriveRxBuffer[FDCAN_DLC_BYTES_8] = {0};
 	ODRIVES1 (FDCAN_HandleTypeDef* fdcanhandle);
 
 	// Can send function
