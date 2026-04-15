@@ -16,7 +16,6 @@
 class ODRIVES1 {
 private:
 	FDCAN_HandleTypeDef* _can;
-	FDCAN_RxHeaderTypeDef odriveCanRxHeader;
 	FDCAN_FilterTypeDef odriveCanFilter;
 
 	// TODO: Replace test bytes
@@ -25,6 +24,7 @@ private:
 public:
 	// Internal States
 	uint8_t odriveRxBuffer[FDCAN_DLC_BYTES_8] = {0};
+	FDCAN_RxHeaderTypeDef odriveCanRxHeader= {0};
 	odrive_can_version_t version = {0};
 	odrive_can_heartbeat_t heartbeat = {0};
 	odrive_can_error_t error = {0};
