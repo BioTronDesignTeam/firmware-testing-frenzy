@@ -26,7 +26,7 @@ public:
 	uint8_t odriveRxBuffer[FDCAN_DLC_BYTES_8] = {0};
 	ODRIVES1 (FDCAN_HandleTypeDef* fdcanhandle);
 
-	// Can send function
+	// CAN send function
 	HAL_StatusTypeDef sendGetMsgCAN(uint32_t identifier);
 	HAL_StatusTypeDef sendSetMsgCAN(uint32_t identifier);
 
@@ -41,6 +41,9 @@ public:
 	HAL_StatusTypeDef getBusVoltageCurrent(odrive_can_bus_t* busVoltageCurrent);
 	HAL_StatusTypeDef getTorques(odrive_can_torque_t* torques);
 	HAL_StatusTypeDef getPowers(odrive_can_power_t* powers);
+
+	// Callback
+	HAL_StatusTypeDef responseCallback(uint32_t identifier);
 
 	// TODO: Add proper parameters to following sections
 	// Setters
