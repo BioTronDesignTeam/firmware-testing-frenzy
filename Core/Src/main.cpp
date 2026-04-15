@@ -119,15 +119,25 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  odriveS1Handle->setAxisState(0x8);
+  bool isClosedLoop = false;
   while (1)
   {
-	  if (odriveS1Handle->odriveRxBuffer[4] == 0x8) {
-		  BSP_LED_Toggle(LED_RED);
+	  if (BSP_PB_GetState(BUTTON_USER) == BUTTON_PRESSED) {
+		  if (isClosedLoop) {
+			  odriveS1Handle->setAxisState(0x1);
+			  isClosedLoop = false;
+			  BSP_LED_Off(LED_RED);
+		  }
+		  else {
+			  odriveS1Handle->setAxisState(0x8);
+			  HAL_Delay(500);
+			  odriveS1Handle->setInputVelocity(2, 1);
+			  isClosedLoop = true;
+			  BSP_LED_On(LED_RED);
+		  }
 	  }
 	  BSP_LED_Toggle(LED_GREEN);
-	  odriveS1Handle->setInputTorque(1);
-	  HAL_Delay(1000);
+	  HAL_Delay(500);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -279,7 +289,6 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
     	Error_Handler();
     }
     else {
-    	BSP_LED_Toggle(LED_YELLOW);
     	odriveS1Handle->responseCallback(odriveCanRxHeader.Identifier);
     }
 
