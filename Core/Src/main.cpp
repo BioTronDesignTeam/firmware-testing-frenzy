@@ -279,8 +279,8 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
     	Error_Handler();
     }
     else {
-
     	BSP_LED_Toggle(LED_YELLOW);
+    	odriveS1Handle->responseCallback(odriveCanRxHeader.Identifier);
     }
 
     if (HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
