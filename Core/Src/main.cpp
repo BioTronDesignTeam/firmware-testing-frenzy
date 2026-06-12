@@ -45,6 +45,8 @@ COM_InitTypeDef BspCOMInit;
 
 FDCAN_HandleTypeDef hfdcan1;
 
+I2C_HandleTypeDef hi2c1;
+
 /* USER CODE BEGIN PV */
 FDCAN_FilterTypeDef odriveCanFilter;
 uint8_t rxData[8] = {0};
@@ -54,6 +56,7 @@ uint8_t rxData[8] = {0};
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_FDCAN1_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -93,6 +96,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_FDCAN1_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   initDrivers();
   /* USER CODE END 2 */
@@ -121,22 +125,24 @@ int main(void)
   bool isClosedLoop = false;
   while (1)
   {
-	  if (BSP_PB_GetState(BUTTON_USER) == BUTTON_PRESSED) {
-		  if (isClosedLoop) {
-			  odriveS1Handle->setAxisState(0x1);
-			  isClosedLoop = false;
-			  BSP_LED_Off(LED_RED);
-		  }
-		  else {
-			  odriveS1Handle->setAxisState(0x8);
-			  HAL_Delay(500);
-			  odriveS1Handle->setInputVelocity(2, 1);
-			  isClosedLoop = true;
-			  BSP_LED_On(LED_RED);
-		  }
-	  }
 	  BSP_LED_Toggle(LED_GREEN);
 	  HAL_Delay(500);
+//	  if (BSP_PB_GetState(BUTTON_USER) == BUTTON_PRESSED) {
+//		  if (isClosedLoop) {
+//			  odriveS1Handle->setAxisState(0x1);
+//			  isClosedLoop = false;
+//			  BSP_LED_Off(LED_RED);
+//		  }
+//		  else {
+//			  odriveS1Handle->setAxisState(0x8);
+//			  HAL_Delay(500);
+//			  odriveS1Handle->setInputVelocity(2, 1);
+//			  isClosedLoop = true;
+//			  BSP_LED_On(LED_RED);
+//		  }
+//	  }
+//	  BSP_LED_Toggle(LED_GREEN);
+//	  HAL_Delay(500);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -257,6 +263,54 @@ static void MX_FDCAN1_Init(void)
 }
 
 /**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.Timing = 0x10707DBC;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -271,6 +325,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
